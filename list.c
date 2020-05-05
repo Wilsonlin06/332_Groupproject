@@ -61,12 +61,12 @@ int renameFile() {
 		//child
 		execl("/bin/mv", "mv", "t1.txt", "tree.txt", (char *)0);
 	}
-	else if (f == -1) { printf("Error forking child\n"); perror("list.renameFile"); return -5; }
+	else if (f == -1) { printf("Error forking child\n"); perror("list.renameFile"); return -7; }
 	else {
 		//parent waits for execution
 		status = waitpid(f, &status, 0);
 	}
-	if (status == -1) { printf("Error waiting for child\n"); perror("list.renameFile"); return -6; }
+	if (status == -1) { printf("Error waiting for child\n"); perror("list.renameFile"); return -8; }
 	return 0;
 }
 
