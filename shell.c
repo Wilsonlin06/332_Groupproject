@@ -3,18 +3,25 @@ The program assumes that the custom commands [tree, path, list, exit]
 that  you want to execute are called tree.exe, path.exe, list.exe, 
 and they all reside in the same directory as this program.
 */
-
+#define _POSIX_SOURCE
+#include <dirent.h>
+#include <errno.h>
+#include <sys/types.h>
+#undef _POSIX_SOURCE
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 
 // Custom project commands
 char* custom_commands[] = {"tree", "path", "list", "exit"}; 
 
 int len = sizeof(custom_commands)/sizeof(char *);
+char* cmds[4];
 
 int execute_system_commands(char** args) {
 	pid_t pid;
@@ -35,11 +42,26 @@ int execute_system_commands(char** args) {
 
 int execute_custom_commands(char** args) {
 	int pid;
-
 	pid = fork();
+    
+    // Uncomment when the commands are implemented!
 	if(pid == 0) {
-		execv(args[0], args);
-	    perror("Custom command execution failed!");
+		// if(!strcmp("tree", args[0])){
+		// 	printf("Command tree\n");
+		// 	tree();
+		// }
+  //       if(!strcmp("exit", args[0])){
+		// 	printf("Command exit\n");
+		// 	exit_();
+		// }
+		// if(!strcmp("path", args[0])){
+		// 	printf("Command path\n");
+		// 	path();
+		// }
+		// if(!strcmp("list", args[0])){
+		// 	printf("Command list\n");
+		// 	list();
+		// }
 	} else if (pid < 0) {
 	    perror("Error forking");
 	} else {
