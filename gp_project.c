@@ -39,7 +39,7 @@ int execute_system_commands(char** args) {
 	return 1;
 }
 
-void tree(){
+int tree(){
 	printf("%s\n", "Test output: Tree command.");
     struct stat st = {0};
     char path[50];
@@ -68,6 +68,7 @@ void tree(){
 		int file3 = open(path, O_WRONLY | O_CREAT, 0777);
 		printf("File t3.txt created successfully!\n");
 	}else printf("The file t3.txt exists.\n");
+	return 1;
 }
 int clearTerminal() {
 	//clears the terminal screen
@@ -83,7 +84,7 @@ int clearTerminal() {
 		status = waitpid(f, &status, 0);
 	}
 	if (status == -1) { printf("Error waiting for child\n"); perror("list.clearTerminal"); return -2; }
-	return 0;
+	return 1;
 }
 
 int printContents() {
@@ -100,7 +101,7 @@ int printContents() {
 		status = waitpid(f, &status, 0);
 	}
 	if (status == -1) { printf("Error waiting for child\n"); perror("list.printContents"); return -4; }
-	return 0;
+	return 1;
 }
 
 int printToFile() {
@@ -117,7 +118,7 @@ int printToFile() {
 		status = waitpid(f, &status, 0);
 	}
 	if (status == -1) { printf("Error waiting for child\n"); perror("list.printToFile"); return -6; }
-	return 0;
+	return 1;
 }
 
 int renameFile() {
@@ -134,15 +135,16 @@ int renameFile() {
 		status = waitpid(f, &status, 0);
 	}
 	if (status == -1) { printf("Error waiting for child\n"); perror("list.renameFile"); return -8; }
-	return 0;
+	return 1;
 }
-void list(){
+int list(){
 	clearTerminal();
 	printContents();
 	printToFile();
 	renameFile();
+	return 1;
 }
-void path(){
+int path(){
 	FILE *file1,*file2,*file3;
    char cwd[100];
    char meg[100]; 
@@ -217,7 +219,10 @@ void path(){
       printf("Deleted successfully\n"); }
    else{
       printf("Unable to delete the file\n");} 
+
+    return 1;
 }
+
 int exit_(){
     struct dirent *de; // Pointer for directory entry
     char fileName[255];
@@ -242,7 +247,6 @@ int exit_(){
 }
 
 int execute_custom_commands(char** args) {
-	int pid;
 	// allocate memory and copy strings
     new_argv = malloc((agc+1) * sizeof *new_argv);
     for(int i = 0; i < agc; ++i)
@@ -272,29 +276,20 @@ int execute_custom_commands(char** args) {
 			printf("%s\n", new_argv[i]);
 		}
 	}
-	pid = fork();
-	if(pid == 0) {
-		if(!strcmp("tree", args[0])){
-			printf("Command tree\n");
-			tree();
-		}
-		if(!strcmp("exit", args[0])){
-			return exit_();
-		}
-		if(!strcmp("path", args[0])){
-			printf("Command path\n");
-			path();
-		}
-		if(!strcmp("list", args[0])){
-			printf("Command list\n");
-			list();
-		}
-	} else if (pid < 0) {
-	    perror("Error forking");
-	} else {
-		waitpid(pid, NULL, 0); // wait for the child
+	if(!strcmp("tree", args[0])){
+		return tree();
 	}
-	return 1;
+	else if(!strcmp("exit", args[0])){
+		return exit_();
+	}
+	else if(!strcmp("path", args[0])){
+		return path();
+	}
+	else if(!strcmp("list", args[0])){
+		return list();
+	} else {
+		return 1;
+	}
 }
 
 int execute_commands(char** args) {
