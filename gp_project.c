@@ -39,7 +39,7 @@ int execute_system_commands(char** args) {
 	return 1;
 }
 
-void tree(){
+int tree(){
 	printf("%s\n", "Test output: Tree command.");
     struct stat st = {0};
     char path[50];
@@ -68,8 +68,10 @@ void tree(){
 		int file3 = open(path, O_WRONLY | O_CREAT, 0777);
 		printf("File t3.txt created successfully!\n");
 	}else printf("The file t3.txt exists.\n");
+	return 1;
 }
-int clearTerminal() {
+
+void clearTerminal() {
 	//clears the terminal screen
 	int status, f;
 	f = fork();
@@ -77,16 +79,15 @@ int clearTerminal() {
 		//child
 		execl("/bin/sh", "sh", "-c", "clear", (char *)0);
 	}
-	else if (f == -1) { printf("Error forking child\n"); perror("list.clearTerminal"); return -1; }
+	else if (f == -1) { printf("Error forking child\n"); perror("list.clearTerminal");}
 	else {
 		//parent waits for execution
 		status = waitpid(f, &status, 0);
 	}
-	if (status == -1) { printf("Error waiting for child\n"); perror("list.clearTerminal"); return -2; }
-	return 0;
+	if (status == -1) { printf("Error waiting for child\n"); perror("list.clearTerminal");}
+	
 }
-
-int printContents() {
+void printContents() {
 	//prints detailed contents of cwd to terminal
 	int status, f;
 	f = fork();
@@ -94,16 +95,15 @@ int printContents() {
 		//child
 		execl("/bin/ls", "ls", "-l", (char *)0);
 	}
-	else if (f == -1) { printf("Error forking child\n"); perror("list.printContents"); return -3; }
+	else if (f == -1) { printf("Error forking child\n"); perror("list.printContents");}
 	else {
 		//parent waits for execution
 		status = waitpid(f, &status, 0);
 	}
-	if (status == -1) { printf("Error waiting for child\n"); perror("list.printContents"); return -4; }
-	return 0;
+	if (status == -1) { printf("Error waiting for child\n"); perror("list.printContents");}
+	
 }
-
-int printToFile() {
+void printToFile() {
 	//prints detailed contents of cwd to t1.txt
 	int status, f;
 	f = fork();
@@ -111,16 +111,15 @@ int printToFile() {
 		//child
 		execl("/bin/sh", "sh", "-c", "ls -l >> t1.txt", (char *)0);
 	}
-	else if (f == -1) { printf("Error forking child\n"); perror("list.printToFile"); return -5; }
+	else if (f == -1) { printf("Error forking child\n"); perror("list.printToFile"); }
 	else {
 		//parent waits for execution
 		status = waitpid(f, &status, 0);
 	}
-	if (status == -1) { printf("Error waiting for child\n"); perror("list.printToFile"); return -6; }
-	return 0;
+	if (status == -1) { printf("Error waiting for child\n"); perror("list.printToFile"); }
+	
 }
-
-int renameFile() {
+void renameFile() {
 	//changes name of t1.txt to tree.txt
 	int status, f;
 	f = fork();
@@ -128,21 +127,23 @@ int renameFile() {
 		//child
 		execl("/bin/mv", "mv", "t1.txt", "tree.txt", (char *)0);
 	}
-	else if (f == -1) { printf("Error forking child\n"); perror("list.renameFile"); return -7; }
+	else if (f == -1) { printf("Error forking child\n"); perror("list.renameFile");}
 	else {
 		//parent waits for execution
 		status = waitpid(f, &status, 0);
 	}
-	if (status == -1) { printf("Error waiting for child\n"); perror("list.renameFile"); return -8; }
-	return 0;
+	if (status == -1) { printf("Error waiting for child\n"); perror("list.renameFile");}
+	
 }
-void list(){
+int list(){
 	clearTerminal();
 	printContents();
 	printToFile();
 	renameFile();
+	return 1;
 }
-void path(){
+
+int path(){
 	FILE *file1,*file2,*file3;
    char cwd[100];
    char meg[100]; 
@@ -170,8 +171,7 @@ void path(){
    file1 = fopen("tree.txt", "r"); 
    if (file1 == NULL) 
    { 
-       printf("Cannot open file tree.txt\n"); 
-       exit(0); 
+       printf("Cannot open file tree.txt\n");
    } 
   
   
@@ -179,13 +179,11 @@ void path(){
    if (file2 == NULL) 
    { 
        printf("Cannot open file path-info.txt \n"); 
-       exit(0); 
    } 
    file3 = fopen("t3.txt","w");
    if (file3 == NULL) 
    { 
        printf("Cannot open file t3.txt \n"); 
-       exit(0); 
    } 
    // Read contents from file 
    c = fgetc(file1); 
@@ -217,32 +215,12 @@ void path(){
       printf("Deleted successfully\n"); }
    else{
       printf("Unable to delete the file\n");} 
-}
-int exit_(){
-    struct dirent *de; // Pointer for directory entry
-    char fileName[255];
-    DIR *dr = opendir(".");
 
-    printf("Commands history:\n");
-	for(int i = 0;i < 4;i++){
-        printf("%d.%s\n",i+1,cmds[i]);
-    }
-
-	printf("Files list in current directory:\n");
-    while ((de = readdir(dr)) != NULL){
-        printf("%s\n", de->d_name);
-    }
-    closedir(dr);
-    printf("%s\n","Press 'enter' to exit.");
-    if(getchar() != '\n') return 1;
-    else {
-        printf("%s\n", "Bye");
-        return 0;
-    }
+    return 1;
 }
 
-int execute_custom_commands(char** args) {
-	int pid;
+// To store commands and make a command history
+void cmdhistory(char** args){
 	// allocate memory and copy strings
     new_argv = malloc((agc+1) * sizeof *new_argv);
     for(int i = 0; i < agc; ++i)
@@ -269,32 +247,48 @@ int execute_custom_commands(char** args) {
 				cmds[cmd_cnt] = new_argv[i];
 				cmd_cnt++;
 			}
-			printf("%s\n", new_argv[i]);
 		}
 	}
-	pid = fork();
-	if(pid == 0) {
-		if(!strcmp("tree", args[0])){
-			printf("Command tree\n");
-			tree();
-		}
-		if(!strcmp("exit", args[0])){
-			return exit_();
-		}
-		if(!strcmp("path", args[0])){
-			printf("Command path\n");
-			path();
-		}
-		if(!strcmp("list", args[0])){
-			printf("Command list\n");
-			list();
-		}
-	} else if (pid < 0) {
-	    perror("Error forking");
+}
+
+int exit_(){
+    struct dirent *de; // Pointer for directory entry
+    DIR *dr = opendir(".");
+
+    printf("Commands history:\n");
+	for(int i = 0;i < 4;i++){
+        printf("%d.%s\n",i+1,cmds[i]);
+    }
+
+	printf("Files list in current directory:\n");
+    while ((de = readdir(dr)) != NULL){
+        printf("%s\n", de->d_name);
+    }
+    closedir(dr);
+    printf("%s\n","Press 'enter' to exit.");
+    if(getchar() != '\n') return 1;
+    else {
+        printf("%s\n", "Thank you! Bye!");
+        return 0;
+    }
+}
+
+int execute_custom_commands(char** args) {
+	cmdhistory(args);
+	if(!strcmp("tree", args[0])){
+		return tree();
+	}
+	else if(!strcmp("exit", args[0])){
+		return exit_();
+	}
+	else if(!strcmp("path", args[0])){
+		return path();
+	}
+	else if(!strcmp("list", args[0])){
+		return list();
 	} else {
-		waitpid(pid, NULL, 0); // wait for the child
+		return 1;
 	}
-	return 1;
 }
 
 int execute_commands(char** args) {
@@ -373,16 +367,7 @@ void loop() {
 		status = execute_commands(args);
 		free(line);
 		free(args);
-		if(status == 0){
-			// free memory
-			for(int i = 0; i < agc; ++i)
-			{
-				free(new_argv[i]);
-			}
-			free(new_argv);
-			exit(status);
-		}
-	} while(status == 1); //if satus is 0, the loop will exit
+	} while(status); //if satus is 0, the loop will exit
 }
 
 int main(int argc, char const** argv)
