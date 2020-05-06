@@ -47,23 +47,24 @@ void tree(){
 		mkdir("Dir0", 0777) ;  // Check if directory doesn't exist, then create directory
 		printf("Folder Dir0 created successfully!\n");
 	}else printf("The folder Dir0 exists.\n");
-    execl("/bin/cd ", "cd ", "Dir0", (char *)0);		// Change the working directory
-    if(stat("Dir0/Dir1/", &st) == -1){
-		mkdir("Dir0/Dir1", 0777);   // Check if directory doesn't exist, then create directory
+	sprintf(path,"%s/","Dir0");
+    chdir(path);		// Change the working directory
+    if(stat("Dir1/", &st) == -1){
+		mkdir("Dir1", 0777);   // Check if directory doesn't exist, then create directory
 		printf("Folder Dir1 created successfully!\n");
 	}else printf("The folder Dir1 exists.\n");
-    if(access("Dir0/t1.txt", F_OK) == -1) {	// Check if file doesn't exist, then create file
-		sprintf(path, "%s/t1.txt", "Dir0");
+    if(access("t1.txt", F_OK) == -1) {	// Check if file doesn't exist, then create file
+		sprintf(path, "%st1.txt", "");
 		int file1 = open(path, O_WRONLY | O_CREAT, 0777);
 		printf("File t1.txt created successfully!\n");
 	}else printf("The file t1.txt exists.\n");
-	if(access("Dir0/t2.txt", F_OK) == -1) {  // Check if file doesn't exist, then create file
-		sprintf(path, "%s/t2.txt", "Dir0");
+	if(access("t2.txt", F_OK) == -1) {  // Check if file doesn't exist, then create file
+		sprintf(path, "%st2.txt", "");
 		int file2 = open(path, O_WRONLY | O_CREAT, 0777);
 		printf("File t2.txt created successfully!\n");
 	}else printf("The file t2.txt exists.\n");
-	if(access("Dir0/t3.txt", F_OK) == -1) {  // Check if file doesn't exist, then create file
-		sprintf(path, "%s/t3.txt", "Dir0");
+	if(access("t3.txt", F_OK) == -1) {  // Check if file doesn't exist, then create file
+		sprintf(path, "%st3.txt", "");
 		int file3 = open(path, O_WRONLY | O_CREAT, 0777);
 		printf("File t3.txt created successfully!\n");
 	}else printf("The file t3.txt exists.\n");
